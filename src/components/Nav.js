@@ -15,7 +15,7 @@ class Nav extends Component {
       case '/':
         this.setState({ activeItem: 'Leaderboard' })
         break
-      case '/Admin':
+      case '/admin':
         this.setState({ activeItem: 'Admin' })
         break
       default:
@@ -39,7 +39,7 @@ class Nav extends Component {
           Leaderboard
         </Menu.Item>
 
-        <Menu.Item name="Admin" active={activeItem === 'Admin'} onClick={this.handleItemClick} position="right" as={Link} to="/Admin">
+        <Menu.Item name="Admin" active={activeItem === 'Admin'} onClick={this.handleItemClick} position="right" as={Link} to="/admin">
           <Icon name="user" />
           Admin
         </Menu.Item>

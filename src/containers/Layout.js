@@ -7,14 +7,18 @@ import Nav from '../components/Nav'
 export default class Layout extends Component {
   render() {
     return (
-      <Grid centered>
-        <Grid.Row columns={1}>
+      <Grid>
+        <Grid.Row>
           <Grid.Column width={16}>
             <Nav />
           </Grid.Column>
         </Grid.Row>
 
-        {this.props.children}
+        <Grid container centered>
+          <Grid.Row columns={1}>
+            <Grid.Column width={16}>{this.props.children}</Grid.Column>
+          </Grid.Row>
+        </Grid>
       </Grid>
     )
   }
