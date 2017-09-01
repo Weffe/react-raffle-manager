@@ -1,15 +1,15 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Raffle Manager",
+  "name": "Raffle Manager - Swing Dance Club",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "192x192",
+      "src": "csuf-favicon.png",
+      "sizes": "16x16",
       "type": "image/png"
     }
   ],
   "start_url": "./index.html",
   "display": "standalone",
-  "theme_color": "#000000",
+  "theme_color": "#2185d0",
   "background_color": "#ffffff"
 }

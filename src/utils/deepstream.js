@@ -7,6 +7,6 @@ export const client = deepstream('wss://013.deepstreamhub.com?apiKey=c8ee9a23-71
   password: d('bXVzaWM0bGlmZQ==')
 })
 
-export const raffleList = client.record.getList('users')
-export const testRecord = client.record.getRecord('raffle/test')
+export const usersList = client.record.getList('users')
+export const raffleEntriesRecord = client.record.getRecord('raffle/entries')
 export const privateRecord = client.record.getRecord('private/info')

@@ -13,7 +13,6 @@ class Nav extends Component {
 
     switch (initialRoute) {
       case '/':
-      case '/Leaderboard':
         this.setState({ activeItem: 'Leaderboard' })
         break
       case '/Admin':
@@ -35,14 +34,7 @@ class Nav extends Component {
           Raffle Manager
         </Menu.Item>
 
-        <Menu.Item
-          name="Leaderboard"
-          active={activeItem === 'Leaderboard'}
-          color="red"
-          onClick={this.handleItemClick}
-          as={Link}
-          to="/Leaderboard"
-        >
+        <Menu.Item name="Leaderboard" active={activeItem === 'Leaderboard'} color="red" onClick={this.handleItemClick} as={Link} to="/">
           <Icon name="ordered list" />
           Leaderboard
         </Menu.Item>

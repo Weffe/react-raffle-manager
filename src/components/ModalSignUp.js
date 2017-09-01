@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { Button, Header, Icon, Modal, Form, Message } from 'semantic-ui-react'
 import { registerNewUser } from '../utils/api'
+import { isEmpty, forEach } from 'lodash'
+import { toast } from 'react-toastify'
 
 const SignUpButton = () => {
   return (
@@ -12,20 +14,27 @@ const SignUpButton = () => {
 }
 
 export default class ModalSignUp extends Component {
-  state = { pwsDontMatch: null, dirty: false }
-  handleChange = ({ target: { name, value } }) => this.setState({ [name]: value, dirty: true })
+  state = { pwsDontMatch: null }
+
+  handleChange = ({ target: { name, value } }) => this.setState({ [name]: value })
+
   handleSignUp = () => {
-    const { firstName, lastName, username, email, repassword, password, dirty } = this.state
-    if (repassword !== password) {
-      this.setState({ hasError: true, errorType: 'pw_nomatch' })
-    } else if (
-      (firstName === '' || lastName === '' || username === '' || email === '' || password === '' || repassword === '') &&
-      dirty === false
-    ) {
+    const { firstName, lastName, username, email, repassword, password } = this.state
+    let someFieldIsEmpty = false
+    forEach([firstName, lastName, username, email, repassword, password], item => {
+      if (isEmpty(item)) someFieldIsEmpty = true
+    })
+
+    if (someFieldIsEmpty) {
       this.setState({ hasError: true, errorType: 'pw_empty' })
+    } else if (repassword !== password) {
+      this.setState({ hasError: true, errorType: 'pw_nomatch' })
     } else {
       this.setState({ hasError: false })
       registerNewUser(firstName, lastName, username, password, email)
+      toast.success('Successfully signed up!', {
+        position: toast.POSITION.TOP_CENTER
+      })
       this.signUpNode.state.open = false
     }
   }
@@ -63,11 +72,11 @@ export default class ModalSignUp extends Component {
               onChange={this.handleChange}
               required
             />
-            <Message error hidden={!this.state.hasError}>
+            <Message error visible={this.state.hasError}>
               {this.state.errorType == 'pw_nomatch' ? (
                 <Message.Header>Your passwords don't match!</Message.Header>
               ) : (
-                <Message.Header>A password field is empty!</Message.Header>
+                <Message.Header>A form field is empty!</Message.Header>
               )}
             </Message>
           </Form>
