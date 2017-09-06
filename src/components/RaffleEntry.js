@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Checkbox, Form } from 'semantic-ui-react'
+import { Button, Form } from 'semantic-ui-react'
 import { incrementRaffleTickets } from '../utils/api'
 import { ToastContainer, toast } from 'react-toastify'
 
@@ -29,6 +29,8 @@ export default class RaffleEntry extends Component {
         toast.warn('Already added your weekly ticket!', {
           position: toast.POSITION.TOP_CENTER
         })
+        break
+      default:
         break
     }
   }

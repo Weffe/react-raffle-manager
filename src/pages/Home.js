@@ -1,16 +1,18 @@
 import React, { Component } from 'react'
-import { Grid, Button } from 'semantic-ui-react'
+import { Grid } from 'semantic-ui-react'
 import RaffleEntry from '../components/RaffleEntry'
 import Leaderboard from '../components/Leaderboard'
 import ModalSignUp from '../components/ModalSignUp'
+import { observer } from 'mobx-react'
 
+@observer
 export default class Home extends Component {
   state = {}
 
   render() {
     return (
       <Grid stackable>
-        <Grid.Row>
+        <Grid.Row centered>
           <Grid.Column width={16}>
             <ModalSignUp />
           </Grid.Column>

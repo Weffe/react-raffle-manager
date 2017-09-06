@@ -20,7 +20,6 @@ export default class Leaderboard extends Component {
   componentDidMount() {
     raffleEntriesRecord.whenReady(record => {
       let entries = record.get()
-      console.log(entries)
       this.setState({ ready: true, data: entries })
 
       // subscribe to changes
@@ -64,7 +63,7 @@ export default class Leaderboard extends Component {
     if (!ready) return <DimmerWithLoader />
 
     return (
-      <Table striped sortable columns={3}>
+      <Table unstackable striped sortable columns={3}>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell sorted={column === 'firstName' ? direction : null} onClick={this.handleSort('firstName')}>

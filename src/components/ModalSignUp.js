@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import { Button, Header, Icon, Modal, Form, Message } from 'semantic-ui-react'
+import { Button, Header, Modal, Form, Message } from 'semantic-ui-react'
 import { registerNewUser } from '../utils/api'
 import { isEmpty, forEach } from 'lodash'
 import { toast } from 'react-toastify'
 
 const SignUpButton = () => {
   return (
-    <Button animated="fade" color="green">
+    <Button animated="fade" color="green" size="big" circular>
       <Button.Content visible>Sign-up for an account</Button.Content>
       <Button.Content hidden>It's Free!</Button.Content>
     </Button>
@@ -73,7 +73,7 @@ export default class ModalSignUp extends Component {
               required
             />
             <Message error visible={this.state.hasError}>
-              {this.state.errorType == 'pw_nomatch' ? (
+              {this.state.errorType === 'pw_nomatch' ? (
                 <Message.Header>Your passwords don't match!</Message.Header>
               ) : (
                 <Message.Header>A form field is empty!</Message.Header>
