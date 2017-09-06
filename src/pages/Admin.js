@@ -7,13 +7,9 @@ import { inject, observer } from 'mobx-react'
 @inject('store')
 @observer
 export default class Admin extends Component {
-  componentDidMount() {
-    const { store } = this.props
-    console.log(store.loginStatus.get())
-  }
-
   render() {
-    const { loginStatus } = this.props.store
+    const { loginStatus } = this.props.store.admin
+    console.log(this.props.store.nav)
     return (
       <Grid centered>
         <Grid.Row columns={1}>

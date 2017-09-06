@@ -16,7 +16,7 @@ const SignUpButton = () => {
 export default class ModalSignUp extends Component {
   state = { pwsDontMatch: null }
 
-  handleChange = ({ target: { name, value } }) => this.setState({ [name]: value })
+  handleChange = ({ target: { name, value } }) => this.setState({ [name]: value.trim() })
 
   handleSignUp = () => {
     const { firstName, lastName, username, email, repassword, password } = this.state
@@ -76,8 +76,8 @@ export default class ModalSignUp extends Component {
               {this.state.errorType === 'pw_nomatch' ? (
                 <Message.Header>Your passwords don't match!</Message.Header>
               ) : (
-                <Message.Header>A form field is empty!</Message.Header>
-              )}
+                  <Message.Header>A form field is empty!</Message.Header>
+                )}
             </Message>
           </Form>
         </Modal.Content>

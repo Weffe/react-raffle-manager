@@ -5,10 +5,6 @@ import 'react-toastify/dist/ReactToastify.min.css'
 import Nav from '../components/Nav'
 
 export default class Layout extends Component {
-  componentWillUnmount() {
-    alert('Unmountin')
-  }
-
   render() {
     return (
       <div>

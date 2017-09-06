@@ -1,32 +1,16 @@
 import React, { Component } from 'react'
 import { Menu, Icon } from 'semantic-ui-react'
-import { Link, withRouter } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { observer, inject } from 'mobx-react'
 
-class Nav extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {}
-  }
-  // set active menu.item on mount based on the initial route
-  componentDidMount() {
-    let initialRoute = this.props.location.pathname
+@inject('store')
+@observer
+export default class Nav extends Component {
 
-    switch (initialRoute) {
-      case '/':
-        this.setState({ activeItem: 'Leaderboard' })
-        break
-      case '/admin':
-        this.setState({ activeItem: 'Admin' })
-        break
-      default:
-        break
-    }
-  }
-
-  handleItemClick = (e, { name }) => this.setState({ activeItem: name })
+  handleItemClick = (e, { name }) => this.props.store.setACtiveNavItem(name)
 
   render() {
-    const { activeItem } = this.state
+    const { activeItem } = this.props.store.nav
 
     return (
       <Menu stackable inverted color="blue" style={{ borderRadius: 0 }}>
@@ -48,4 +32,4 @@ class Nav extends Component {
   }
 }
 
-export default withRouter(Nav)
+

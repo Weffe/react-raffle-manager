@@ -17,17 +17,20 @@ export default class RaffleEntry extends Component {
     switch (successStatus) {
       case 'success':
         toast.success('Successfully added a ticket!', {
-          position: toast.POSITION.TOP_CENTER
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 2000
         })
         break
       case 'error':
         toast.error('Username or Password was incorrect!', {
-          position: toast.POSITION.TOP_CENTER
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 2000
         })
         break
       case 'warn':
         toast.warn('Already added your weekly ticket!', {
-          position: toast.POSITION.TOP_CENTER
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 2000
         })
         break
       default:

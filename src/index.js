@@ -4,7 +4,7 @@ import { Router, Route, Switch } from 'react-router-dom'
 import Layout from './containers/Layout'
 import Home from './pages/Home'
 import Admin from './pages/Admin'
-import Store from './store'
+import store from './store'
 import createBrowserHistory from 'history/createBrowserHistory'
 import { Provider } from 'mobx-react'
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router'
@@ -14,14 +14,8 @@ const routingStore = new RouterStore()
 
 const history = syncHistoryWithStore(browserHistory, routingStore)
 
-const stores = {
-  // Key can be whatever you want
-  store: Store
-  // ...other stores
-}
-
 const Root = () => (
-  <Provider {...stores}>
+  <Provider store={store}>
     <Router history={history}>
       <Layout>
         <Switch>

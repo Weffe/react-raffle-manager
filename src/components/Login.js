@@ -2,20 +2,27 @@ import React, { Component } from 'react'
 import { Grid, Form, Button } from 'semantic-ui-react'
 import { validateLogin } from '../utils/api'
 import { inject, observer } from 'mobx-react'
+import { withRouter } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 @inject('store')
-@observer
-export default class Login extends Component {
-  state = {}
-
+class Login extends Component {
   handleChange = ({ target: { placeholder, value } }) => this.setState({ [placeholder]: value })
 
   handleSubmit = () => {
     const { Username, Password } = this.state
     const { store } = this.props
-    console.log(store)
     if (validateLogin(Username, Password)) {
-      store.loginStatus.set(true)
+      store.login().then((res) => {
+        if (res) {
+          toast.success('Successfully logged in!', {
+            position: toast.POSITION.TOP_CENTER,
+            autoClose: 1500
+          })
+          store.setACtiveNavItem('Leaderboard')
+          this.props.history.push('/')
+        }
+      })
     }
   }
 
@@ -35,3 +42,5 @@ export default class Login extends Component {
     )
   }
 }
+
+export default withRouter(Login)
