@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Grid } from 'semantic-ui-react'
+import { Grid, Segment } from 'semantic-ui-react'
 import RaffleEntry from '../components/RaffleEntry'
 import Leaderboard from '../components/Leaderboard'
 import ModalSignUp from '../components/ModalSignUp'
@@ -8,19 +8,20 @@ import { observer, inject } from 'mobx-react'
 @inject('store')
 @observer
 export default class Home extends Component {
-  renderModalSignUp = (loginStatus) => {
+  renderModalSignUp = loginStatus => {
     if (!loginStatus) return null
 
     return (
       <Grid.Row centered>
         <Grid.Column width={16}>
+          <Segment>Step 1: Sign up if you don't already have an account.</Segment>
           <ModalSignUp />
         </Grid.Column>
       </Grid.Row>
     )
   }
 
-  renderRaffleLeaderboard = (loginStatus) => {
+  renderRaffleLeaderboard = loginStatus => {
     if (!loginStatus) {
       return (
         <Grid.Row>
@@ -34,6 +35,7 @@ export default class Home extends Component {
     return (
       <Grid.Row>
         <Grid.Column width={8}>
+          <Segment>Step 2: Get a raffle ticket!</Segment>
           <RaffleEntry />
         </Grid.Column>
         <Grid.Column width={8}>

@@ -10,31 +10,36 @@ export default class RaffleEntry extends Component {
     this.state = { username: '', password: '' }
   }
 
-  handleSubmit = () => {
-    const successStatus = incrementRaffleTickets(this.state.username, this.state.password)
+  handleSubmit = async () => {
+    // clear values
     this.setState({ username: '', password: '' })
 
+    const successStatus = await incrementRaffleTickets(this.state.username, this.state.password)
+
     switch (successStatus) {
-      case 'success':
+      case 'SUCCESS':
         toast.success('Successfully added a ticket!', {
           position: toast.POSITION.TOP_CENTER,
-          autoClose: 2000
+          autoClose: 2000,
         })
         break
-      case 'error':
+      case 'ERROR':
         toast.error('Username or Password was incorrect!', {
           position: toast.POSITION.TOP_CENTER,
-          autoClose: 2000
+          autoClose: 2000,
         })
         break
-      case 'warn':
+      case 'WARN':
         toast.warn('Already added your weekly ticket!', {
           position: toast.POSITION.TOP_CENTER,
-          autoClose: 2000
+          autoClose: 2000,
         })
         break
       default:
-        break
+        toast.error('There was an unexpected error!', {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 2000,
+        })
     }
   }
 

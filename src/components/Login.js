@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Grid, Form, Button } from 'semantic-ui-react'
 import { validateLogin } from '../utils/api'
-import { inject, observer } from 'mobx-react'
+import { inject } from 'mobx-react'
 import { withRouter } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
@@ -9,15 +9,18 @@ import { toast } from 'react-toastify'
 class Login extends Component {
   handleChange = ({ target: { placeholder, value } }) => this.setState({ [placeholder]: value })
 
-  handleSubmit = () => {
+  handleSubmit = async () => {
     const { Username, Password } = this.state
     const { store } = this.props
-    if (validateLogin(Username, Password)) {
-      store.login().then((res) => {
+
+    const validStatus = await validateLogin(Username, Password)
+
+    if (validStatus) {
+      store.login().then(res => {
         if (res) {
           toast.success('Successfully logged in!', {
             position: toast.POSITION.TOP_CENTER,
-            autoClose: 1500
+            autoClose: 1500,
           })
           store.setACtiveNavItem('Leaderboard')
           this.props.history.push('/')
@@ -29,8 +32,8 @@ class Login extends Component {
   render() {
     return (
       <Grid centered>
-        <Grid.Row columns={1}>
-          <Grid.Column width={8}>
+        <Grid.Row>
+          <Grid.Column width={8} mobile={16}>
             <Form unstackable onSubmit={this.handleSubmit}>
               <Form.Input label="Enter Username" placeholder="Username" type="password" onChange={this.handleChange} />
               <Form.Input label="Enter Password" placeholder="Password" type="password" onChange={this.handleChange} />

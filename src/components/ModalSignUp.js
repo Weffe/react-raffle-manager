@@ -26,16 +26,17 @@ export default class ModalSignUp extends Component {
     })
 
     if (someFieldIsEmpty) {
-      this.setState({ hasError: true, errorType: 'pw_empty' })
+      this.setState({ hasError: true, errorType: 'PW_EMPTY' })
     } else if (repassword !== password) {
-      this.setState({ hasError: true, errorType: 'pw_nomatch' })
+      this.setState({ hasError: true, errorType: 'PW_NOMATCH' })
     } else {
       this.setState({ hasError: false })
-      registerNewUser(firstName, lastName, username, password, email)
-      toast.success('Successfully signed up!', {
-        position: toast.POSITION.TOP_CENTER
+      registerNewUser(firstName, lastName, username, password, email).then(() => {
+        toast.success('Successfully signed up and received 1 raffle ticket!', {
+          position: toast.POSITION.TOP_CENTER,
+        })
+        this.signUpNode.state.open = false
       })
-      this.signUpNode.state.open = false
     }
   }
 
@@ -44,41 +45,14 @@ export default class ModalSignUp extends Component {
       <Modal ref={node => (this.signUpNode = node)} trigger={SignUpButton()} closeIcon closeOnRootNodeClick={false}>
         <Header icon="add user" content="Create Account" />
         <Modal.Content>
-          <Form>
-            <Form.Input
-              label="Enter First Name"
-              placeholder="First Name"
-              name="firstName"
-              type="text"
-              onChange={this.handleChange}
-              required
-            />
+          <Form error={this.state.hasError}>
+            <Form.Input label="Enter First Name" placeholder="First Name" name="firstName" type="text" onChange={this.handleChange} required />
             <Form.Input label="Enter Last Name" placeholder="Last Name" name="lastName" type="text" onChange={this.handleChange} required />
             <Form.Input label="Enter Username" placeholder="Username" name="username" type="text" onChange={this.handleChange} required />
             <Form.Input label="Enter Email" placeholder="Email" name="email" type="email" onChange={this.handleChange} required />
-            <Form.Input
-              label="Enter Password"
-              placeholder="Password"
-              name="password"
-              type="password"
-              onChange={this.handleChange}
-              required
-            />
-            <Form.Input
-              label="Re-Enter Password"
-              placeholder="RePassword"
-              name="repassword"
-              type="password"
-              onChange={this.handleChange}
-              required
-            />
-            <Message error visible={this.state.hasError}>
-              {this.state.errorType === 'pw_nomatch' ? (
-                <Message.Header>Your passwords don't match!</Message.Header>
-              ) : (
-                  <Message.Header>A form field is empty!</Message.Header>
-                )}
-            </Message>
+            <Form.Input label="Enter Password" placeholder="Password" name="password" type="password" onChange={this.handleChange} required />
+            <Form.Input label="Re-Enter Password" placeholder="RePassword" name="repassword" type="password" onChange={this.handleChange} required />
+            <Message error header={this.state.errorType === 'PW_NOMATCH' ? "Your passwords don't match!" : 'A form field is empty!'} />
           </Form>
         </Modal.Content>
         <Modal.Actions>

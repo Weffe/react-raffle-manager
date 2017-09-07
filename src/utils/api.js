@@ -7,12 +7,14 @@ export function d(v) {
 }
 
 export function validateLogin(username, password) {
-  let valid = null
-  privateRecord.whenReady(record => {
-    const data = record.get()
-    valid = d(data.username) === username && d(data.password) === password
+  return new Promise((resolve, reject) => {
+    let validStatus = null
+    privateRecord.whenReady(record => {
+      const data = record.get()
+      validStatus = d(data.username) === username && d(data.password) === password
+    })
+    resolve(validStatus)
   })
-  return valid
 }
 
 /**
@@ -24,67 +26,72 @@ export function validateLogin(username, password) {
  * @param {String} email 
  */
 export function registerNewUser(firstName, lastName, username, password, email) {
-  const guid = client.getUid()
-  const newUserId = `users/${guid}`
-  const lastUpdated = moment()
-  let raffleEntries = null
-  const newData = {
-    guid,
-    firstName,
-    lastName,
-    username,
-    password,
-    email,
-    tickets: 1
-  }
+  return new Promise((resolve, reject) => {
+    const guid = client.getUid()
+    const newUserId = `users/${guid}`
+    const lastUpdated = moment()
+    let raffleEntries = null
+    const newData = {
+      guid,
+      firstName,
+      lastName,
+      username,
+      password,
+      email,
+      tickets: 1,
+    }
 
-  // set new record inside users record
-  client.record.getRecord(newUserId).set(newData)
+    // set new record inside users record
+    client.record.getRecord(newUserId).set(newData)
 
-  // add to usersList
-  usersList.addEntry(newUserId)
+    // add to usersList
+    usersList.addEntry(newUserId)
 
-  // add to raffle entries record
-  raffleEntries = raffleEntriesRecord.get()
-  if (isEmpty(raffleEntries) && isObject(raffleEntries)) raffleEntries = []
-  raffleEntries.push({ ...newData, lastUpdated })
-  raffleEntriesRecord.set(raffleEntries)
+    // add to raffle entries record
+    raffleEntries = raffleEntriesRecord.get()
+    if (isEmpty(raffleEntries) && isObject(raffleEntries)) raffleEntries = []
+    raffleEntries.push({ ...newData, lastUpdated })
+    raffleEntriesRecord.set(raffleEntries)
+    resolve(true)
+  })
 }
 
 export function incrementRaffleTickets(username, password) {
-  let successStatus = 'error'
+  return new Promise((resolve, reject) => {
+    let successStatus = 'ERROR' // default error code
 
-  raffleEntriesRecord.whenReady(record => {
-    const raffleEntries = record.get()
-    let userID = null
+    raffleEntriesRecord.whenReady(record => {
+      const raffleEntries = record.get()
+      let userID = null
 
-    raffleEntries.forEach(entry => {
-      if (entry.username === username && entry.password === password) {
-        // check if the tickets has been updated in the last 6 hours
-        const hourDifference = moment().diff(entry.lastUpdated, 'hours') // change back to hours instead of seconds!
-        if (hourDifference > 6) {
-          entry.tickets += 1
-          entry.lastUpdated = moment()
-          userID = `users/${entry.guid}`
-          successStatus = 'success'
-        } else {
-          successStatus = 'warn'
+      raffleEntries.forEach(entry => {
+        if (entry.username === username && entry.password === password) {
+          // check if the tickets has been updated in the last 6 hours
+          const hourDifference = moment().diff(entry.lastUpdated, 'hours') // change back to hours instead of seconds!
+          if (hourDifference > 6) {
+            entry.tickets += 1
+            entry.lastUpdated = moment()
+            userID = `users/${entry.guid}`
+            successStatus = 'SUCCESS'
+          } else {
+            successStatus = 'WARN'
+          }
         }
+      })
+
+      if (successStatus === 'SUCCESS') {
+        // set raffle entries record
+        record.set(raffleEntries)
+
+        // set specific user info
+        client.record.getRecord(userID).whenReady(record => {
+          const data = record.get()
+          data.tickets += 1
+          record.set(data)
+        })
       }
     })
 
-    if (successStatus === 'success') {
-      // set raffle entries record
-      record.set(raffleEntries)
-
-      // set specific user info
-      client.record.getRecord(userID).whenReady(record => {
-        const data = record.get()
-        data.tickets += 1
-        record.set(data)
-      })
-    }
+    resolve(successStatus)
   })
-
-  return successStatus
 }
