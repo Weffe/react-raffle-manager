@@ -117,10 +117,14 @@ export function getRaffleList() {
       let randomizedEntries = []
 
       raffleEntries.forEach(entry => {
-        // push the same entry N times equal to the no. of tickets
-        for (let i = 0; i < entry.tickets; i++) {
-          randomizedEntries.push(entry)
-        }
+        validateRaffleEntry(entry)
+          .then(res => {
+            // push the same entry N times equal to the no. of tickets
+            for (let i = 0; i < entry.tickets; i++) {
+              randomizedEntries.push(entry)
+            }
+          })
+          .catch(err => console.error(err))
       })
 
       // finally shuffle all entries
@@ -130,26 +134,6 @@ export function getRaffleList() {
       let winnerNotFound = true
       let randomIndex = random(randomizedEntries.length - 1)
       let winner = randomizedEntries[randomIndex]
-      while (winnerNotFound) {
-        const res = validateRaffleWinner(winner)
-
-        if (res) {
-          // we found a valid winner!
-          winnerNotFound = false
-        } else {
-          // the user already won last week so lets remove them from the temporary entries list
-          randomizedEntries.splice(randomIndex, 1)
-
-          // check if the list is empty as an edge case
-          if (isEmpty(randomizedEntries)) {
-            reject('No potential winner found!')
-            break
-          }
-
-          randomIndex = random(randomizedEntries.length - 1)
-          winner = randomizedEntries[randomIndex]
-        }
-      }
 
       let result = { randomizedEntries, winner }
       resolve(result)
@@ -190,16 +174,22 @@ export function updateRaffleWinner(winner) {
   })
 }
 
-function validateRaffleWinner(winner) {
-  if (winner.lastWon) {
-    // check if the tickets has been updated in the last 8 days
-    const daysDifference = moment().diff(winner.lastWon, 'days')
-    if (daysDifference > 8) {
-      return true
+/**
+ * Validates a raffle entry
+ * @param {Object} winner 
+ */
+function validateRaffleEntry(entry) {
+  return new Promise((resolve, reject) => {
+    if (entry.lastWon) {
+      // check if the tickets has been updated in the last 8 days
+      const daysDifference = moment().diff(entry.lastWon, 'days')
+      if (daysDifference > 8) {
+        resolve(entry)
+      } else {
+        reject('User has already won a raffle within the past week!')
+      }
     } else {
-      return false
+      resolve(entry)
     }
-  } else {
-    return true
-  }
+  })
 }

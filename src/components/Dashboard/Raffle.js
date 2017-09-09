@@ -122,11 +122,11 @@ export default class Dashboard extends Component {
       winner = res.winner
     } catch (err) {
       console.error(err)
-      this.handleDimmerClose()
       toast.error('There was an issue selecting a valid winner!', {
         position: toast.POSITION.TOP_CENTER,
         autoClose: 2000
       })
+      this.setState({ dimmerActive: false })
       return
     }
 
