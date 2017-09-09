@@ -1,5 +1,5 @@
 import { client, privateRecord, usersList, raffleEntriesRecord } from './deepstream'
-import { isEmpty, isObject, shuffle, random } from 'lodash'
+import { isEmpty, isObject, random } from 'lodash'
 import moment from 'moment'
 
 export function d(v) {
@@ -114,29 +114,20 @@ export function getRaffleList() {
   return new Promise((resolve, reject) => {
     raffleEntriesRecord.whenReady(record => {
       const raffleEntries = record.get()
-      let randomizedEntries = []
+      let validEntries = []
 
       raffleEntries.forEach(entry => {
         validateRaffleEntry(entry)
           .then(res => {
             // push the same entry N times equal to the no. of tickets
             for (let i = 0; i < entry.tickets; i++) {
-              randomizedEntries.push(entry)
+              validEntries.push(entry)
             }
           })
           .catch(err => console.error(err))
       })
 
-      // finally shuffle all entries
-      randomizedEntries = shuffle(randomizedEntries)
-
-      // choose a random winner
-      let winnerNotFound = true
-      let randomIndex = random(randomizedEntries.length - 1)
-      let winner = randomizedEntries[randomIndex]
-
-      let result = { randomizedEntries, winner }
-      resolve(result)
+      resolve(validEntries)
     })
   })
 }
@@ -146,6 +137,7 @@ export function getRaffleList() {
  * @param {Object} winner
  */
 export function updateRaffleWinner(winner) {
+  console.log(winner)
   return new Promise((resolve, reject) => {
     raffleEntriesRecord.whenReady(record => {
       const raffleEntries = record.get()
@@ -162,7 +154,7 @@ export function updateRaffleWinner(winner) {
       record.set(raffleEntries)
 
       // set specific user info
-      client.record.getRecord(winner.guid).whenReady(record => {
+      client.record.getRecord(`users/${winner.guid}`).whenReady(record => {
         const data = record.get()
         data.tickets = data.tickets >= 1 ? data.tickets - 1 : 0
         data.lastWon = nowDate
@@ -176,7 +168,7 @@ export function updateRaffleWinner(winner) {
 
 /**
  * Validates a raffle entry
- * @param {Object} winner 
+ * @param {Object} entry 
  */
 function validateRaffleEntry(entry) {
   return new Promise((resolve, reject) => {

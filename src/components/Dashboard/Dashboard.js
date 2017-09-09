@@ -6,7 +6,7 @@ import Raffle from './Raffle'
 export default class Dashboard extends Component {
   render() {
     return (
-      <Grid>
+      <Grid stackable>
         <Grid.Row columns={2}>
           <Grid.Column>
             <Grid.Row>

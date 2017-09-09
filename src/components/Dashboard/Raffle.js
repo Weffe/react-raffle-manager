@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import { Grid, Button, Header, Dimmer, Loader, Transition } from 'semantic-ui-react'
+import { Grid, Button, Header, Dimmer, Transition } from 'semantic-ui-react'
 import { getRaffleList, updateRaffleWinner } from '../../utils/api'
-import { random, upperFirst } from 'lodash'
+import { random, upperFirst, shuffle } from 'lodash'
 import { toast } from 'react-toastify'
 import mojs from 'mo-js'
 import './custom.css'
@@ -113,63 +113,69 @@ export default class Dashboard extends Component {
     this.chooseRaffleWinner()
   }
 
-  chooseRaffleWinner = async () => {
+  chooseRaffleWinner = () => {
+    const computedName = entry => `${upperFirst(entry.firstName)} ${upperFirst(entry.lastName)}`
+
     const { transitionDuration } = this.state
-    let randomizedEntries, winner
-    try {
-      const res = await getRaffleList()
-      randomizedEntries = res.randomizedEntries
-      winner = res.winner
-    } catch (err) {
-      console.error(err)
-      toast.error('There was an issue selecting a valid winner!', {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 2000
-      })
-      this.setState({ dimmerActive: false })
-      return
-    }
+    getRaffleList()
+      .then(validEntries => {
+        let shuffledEntries = shuffle(validEntries)
+        let randomIndex = random(shuffledEntries.length - 1)
+        let numEntriesToTransition = shuffledEntries.length // transition the entire list
+        this.setState({ raffleStatus: 'CHOOSING' })
 
-    let randomIndex = random(randomizedEntries.length - 1)
-    const name = entry => `${upperFirst(entry.firstName)} ${upperFirst(entry.lastName)}`
-    let numEntriesToTransition = randomizedEntries.length // transition the entire list
-    this.setState({ raffleStatus: 'CHOOSING' })
+        const intervalID = setInterval(() => {
+          randomIndex = random(shuffledEntries.length - 1)
+          let randomEntry = shuffledEntries[randomIndex]
 
-    const intervalID = setInterval(() => {
-      randomIndex = random(randomizedEntries.length - 1)
-      let entry = randomizedEntries[randomIndex]
+          let randomEntryName = computedName(randomEntry)
 
-      this.setState(state => ({ transitionVisible: !state.transitionVisible }))
+          this.setState(state => ({ transitionVisible: !state.transitionVisible }))
+          this.setState(state => ({ transitionVisible: !state.transitionVisible, entryName: randomEntryName }))
+        }, transitionDuration)
 
-      this.setState(state => ({ transitionVisible: !state.transitionVisible, entryName: name(entry) }))
-    }, transitionDuration)
+        setTimeout(() => {
+          clearInterval(intervalID)
 
-    setTimeout(() => {
-      clearInterval(intervalID)
+          randomIndex = random(shuffledEntries.length - 1)
+          let winner = shuffledEntries[randomIndex]
 
-      this.setState({ entryName: name(winner), raffleStatus: 'COMPLETED' }, () => {
-        // update the winner's tickets and lastWon via api
-        updateRaffleWinner(winner)
+          let winnerName = computedName(winner)
+          console.log(winner)
+          console.log(winnerName)
 
-        // start mo.js
-        fireworks.forEach(burst => {
-          let coords = { x: random(250, document.body.clientWidth - 250), y: random(250, document.body.clientHeight - 250) }
-          burst.tune(coords).replay()
-        })
+          // update the winner's tickets and lastWon via api
+          updateRaffleWinner(winner)
 
-        this.mojsIntervalID = setInterval(() => {
-          fireworks.forEach(burst => {
-            let coords = {
-              x: 0,
-              y: 0,
-              left: random(document.body.clientWidth),
-              top: random(document.body.clientHeight)
-            }
-            burst.tune(coords).replay()
+          this.setState({ entryName: winnerName, raffleStatus: 'COMPLETED' }, () => {
+            // start mo.js
+            fireworks.forEach(burst => {
+              let coords = { x: random(250, document.body.clientWidth - 250), y: random(250, document.body.clientHeight - 250) }
+              burst.tune(coords).replay()
+            })
+
+            this.mojsIntervalID = setInterval(() => {
+              fireworks.forEach(burst => {
+                let coords = {
+                  x: 0,
+                  y: 0,
+                  left: random(document.body.clientWidth),
+                  top: random(document.body.clientHeight)
+                }
+                burst.tune(coords).replay()
+              })
+            }, 1500)
           })
-        }, 1500)
+        }, transitionDuration * numEntriesToTransition)
       })
-    }, transitionDuration * numEntriesToTransition)
+      .catch(err => {
+        console.error(err)
+        toast.error('There was an issue selecting a valid winner!', {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 2000
+        })
+        this.setState({ dimmerActive: false })
+      })
   }
 
   handleDimmerClose = () => {
