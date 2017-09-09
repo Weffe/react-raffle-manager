@@ -1,0 +1,1 @@
+surge ./build/ -d (cat ./CNAME)

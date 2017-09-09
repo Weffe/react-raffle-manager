@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Form } from 'semantic-ui-react'
 import { incrementRaffleTickets } from '../utils/api'
-import { ToastContainer, toast } from 'react-toastify'
+import { toast } from 'react-toastify'
 
 export default class RaffleEntry extends Component {
   constructor(props) {
@@ -20,25 +20,25 @@ export default class RaffleEntry extends Component {
       case 'SUCCESS':
         toast.success('Successfully added a ticket!', {
           position: toast.POSITION.TOP_CENTER,
-          autoClose: 2000,
+          autoClose: 2000
         })
         break
       case 'ERROR':
         toast.error('Username or Password was incorrect!', {
           position: toast.POSITION.TOP_CENTER,
-          autoClose: 2000,
+          autoClose: 2000
         })
         break
       case 'WARN':
         toast.warn('Already added your weekly ticket!', {
           position: toast.POSITION.TOP_CENTER,
-          autoClose: 2000,
+          autoClose: 2000
         })
         break
       default:
         toast.error('There was an unexpected error!', {
           position: toast.POSITION.TOP_CENTER,
-          autoClose: 2000,
+          autoClose: 2000
         })
     }
   }
@@ -67,7 +67,6 @@ export default class RaffleEntry extends Component {
         <Button color="blue" type="submit">
           Get Raffle Ticket
         </Button>
-        <ToastContainer />
       </Form>
     )
   }

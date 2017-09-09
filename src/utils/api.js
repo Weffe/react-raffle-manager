@@ -1,17 +1,28 @@
 import { client, privateRecord, usersList, raffleEntriesRecord } from './deepstream'
-import { isEmpty, isObject } from 'lodash'
+import { isEmpty, isObject, shuffle, random } from 'lodash'
 import moment from 'moment'
 
 export function d(v) {
   return atob(v)
 }
 
-export function validateLogin(username, password) {
+export function validateAppLogin(username, password) {
   return new Promise((resolve, reject) => {
     let validStatus = null
     privateRecord.whenReady(record => {
       const data = record.get()
       validStatus = d(data.username) === username && d(data.password) === password
+    })
+    resolve(validStatus)
+  })
+}
+
+export function validateAdminLogin(key) {
+  return new Promise((resolve, reject) => {
+    let validStatus = null
+    privateRecord.whenReady(record => {
+      const data = record.get()
+      validStatus = d(data.key) === key
     })
     resolve(validStatus)
   })
@@ -38,7 +49,7 @@ export function registerNewUser(firstName, lastName, username, password, email) 
       username,
       password,
       email,
-      tickets: 1,
+      tickets: 1
     }
 
     // set new record inside users record
@@ -94,4 +105,101 @@ export function incrementRaffleTickets(username, password) {
 
     resolve(successStatus)
   })
+}
+
+/**
+ * @return {Object} - returns an object with randomizedEntries: Array & winner: Object
+ */
+export function getRaffleList() {
+  return new Promise((resolve, reject) => {
+    raffleEntriesRecord.whenReady(record => {
+      const raffleEntries = record.get()
+      let randomizedEntries = []
+
+      raffleEntries.forEach(entry => {
+        // push the same entry N times equal to the no. of tickets
+        for (let i = 0; i < entry.tickets; i++) {
+          randomizedEntries.push(entry)
+        }
+      })
+
+      // finally shuffle all entries
+      randomizedEntries = shuffle(randomizedEntries)
+
+      // choose a random winner
+      let winnerNotFound = true
+      let randomIndex = random(randomizedEntries.length - 1)
+      let winner = randomizedEntries[randomIndex]
+      while (winnerNotFound) {
+        const res = validateRaffleWinner(winner)
+
+        if (res) {
+          // we found a valid winner!
+          winnerNotFound = false
+        } else {
+          // the user already won last week so lets remove them from the temporary entries list
+          randomizedEntries.splice(randomIndex, 1)
+
+          // check if the list is empty as an edge case
+          if (isEmpty(randomizedEntries)) {
+            reject('No potential winner found!')
+            break
+          }
+
+          randomIndex = random(randomizedEntries.length - 1)
+          winner = randomizedEntries[randomIndex]
+        }
+      }
+
+      let result = { randomizedEntries, winner }
+      resolve(result)
+    })
+  })
+}
+
+/**
+ * Deducts 1 ticket and updates lastWon date for the winner
+ * @param {Object} winner
+ */
+export function updateRaffleWinner(winner) {
+  return new Promise((resolve, reject) => {
+    raffleEntriesRecord.whenReady(record => {
+      const raffleEntries = record.get()
+      const nowDate = moment()
+
+      raffleEntries.forEach(entry => {
+        if (winner.guid === entry.guid) {
+          entry.tickets = entry.tickets >= 1 ? entry.tickets - 1 : 0
+          entry.lastWon = nowDate
+        }
+      })
+
+      // set raffle entries record
+      record.set(raffleEntries)
+
+      // set specific user info
+      client.record.getRecord(winner.guid).whenReady(record => {
+        const data = record.get()
+        data.tickets = data.tickets >= 1 ? data.tickets - 1 : 0
+        data.lastWon = nowDate
+        record.set(data)
+      })
+    })
+
+    resolve(true)
+  })
+}
+
+function validateRaffleWinner(winner) {
+  if (winner.lastWon) {
+    // check if the tickets has been updated in the last 8 days
+    const daysDifference = moment().diff(winner.lastWon, 'days')
+    if (daysDifference > 8) {
+      return true
+    } else {
+      return false
+    }
+  } else {
+    return true
+  }
 }
