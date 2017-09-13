@@ -22,9 +22,7 @@ export default class ModalSignUp extends Component {
       this.setState({ hasError: true, errorType: 'PW_NOMATCH' })
     } else {
       registerNewUser(firstName, lastName, username, password, email).then(() => {
-        toast.success('Successfully signed up and received 1 raffle ticket!', {
-          position: toast.POSITION.TOP_CENTER
-        })
+        toast.success('Successfully signed up and received 1 raffle ticket!')
         this.setState({ hasError: false, modalActive: false })
       })
     }

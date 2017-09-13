@@ -22,10 +22,7 @@ class AppLogin extends Component {
 
       store.login().then(res => {
         if (res) {
-          toast.success('Successfully logged in!', {
-            position: toast.POSITION.TOP_CENTER,
-            autoClose: 1500
-          })
+          toast.success('Successfully logged in!')
           store.setACtiveNavItem('Leaderboard')
           this.props.history.push('/')
         }

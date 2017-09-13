@@ -2,8 +2,34 @@ import { client, privateRecord, usersList, raffleEntriesRecord } from './deepstr
 import { isEmpty, isObject, random } from 'lodash'
 import moment from 'moment'
 
+
 export function d(v) {
   return atob(v)
+}
+
+/**
+ * TODO
+ * Gets the password of a user via specified credentials
+ * @param {string} username
+ * @param {string} email 
+ */
+function getUserPassword(username, email) {
+  return new Promise((resolve, reject) => {
+    usersList.whenReady(list => {
+      const users = list.getEntries()
+      let newlist = []
+      users.forEach((userID) => {
+        client.record.getRecord(userID).whenReady(record => {
+          let username = record.get('username')
+          if (!isEmpty(username)) {
+            newlist.push(userID)
+          }
+        })
+      })
+
+      setTimeout(() => console.log(newlist.length), 3000)
+    })
+  })
 }
 
 export function validateAppLogin(username, password) {
