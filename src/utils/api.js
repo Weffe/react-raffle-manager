@@ -7,27 +7,76 @@ export function d(v) {
   return atob(v)
 }
 
+function dump() {
+  raffleEntriesRecord.whenReady(record => {
+    const entries = record.get()
+
+    entries.forEach(entry => {
+      console.log('first name:' + entry.firstName)
+      console.log('last name:' + entry.lastName)
+      console.log('u:' + entry.username)
+      console.log('p' + entry.password)
+      console.log('----------')
+    })
+  })
+}
+
 /**
- * TODO
  * Gets the password of a user via specified credentials
+ * @param {string} email
  * @param {string} username
- * @param {string} email 
  */
-function getUserPassword(username, email) {
+function getUserPassword(email, username) {
   return new Promise((resolve, reject) => {
     usersList.whenReady(list => {
       const users = list.getEntries()
-      let newlist = []
-      users.forEach((userID) => {
+      let usersLength = users.length - 1
+      let foundPassword = null
+      let foundMatch = false
+      users.forEach((userID, index) => {
+
         client.record.getRecord(userID).whenReady(record => {
-          let username = record.get('username')
-          if (!isEmpty(username)) {
-            newlist.push(userID)
+          let data = record.get()
+
+          if (data.username === username && data.email === email) {
+            foundPassword = data.password
+            resolve(foundPassword)
+          }
+          else if (!foundMatch && index === usersLength) {
+            reject('No matched password found.')
           }
         })
       })
+    })
+  })
+}
 
-      setTimeout(() => console.log(newlist.length), 3000)
+/**
+ * Gets the username of a user via specified credentials
+ * @param {string} email
+ * @param {string} password 
+ */
+function getUsername(email, password) {
+  return new Promise((resolve, reject) => {
+    usersList.whenReady(list => {
+      const users = list.getEntries()
+      let usersLength = users.length - 1
+      let foundUsername = null
+      let foundMatch = false
+      users.forEach((userID, index) => {
+
+        client.record.getRecord(userID).whenReady(record => {
+          let data = record.get()
+
+          if (data.password === password && data.email === email) {
+            foundUsername = data.username
+            resolve(foundUsername)
+          }
+          else if (!foundMatch && index === usersLength) {
+            reject('No matched password found.')
+          }
+        })
+      })
     })
   })
 }
