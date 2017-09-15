@@ -23,10 +23,18 @@ export default class Nav extends Component {
           Leaderboard
         </Menu.Item>
 
-        <Menu.Item name="Admin" active={activeItem === 'Admin'} onClick={this.handleItemClick} position="right" as={Link} to="/admin">
-          <Icon name="user" />
-          Admin
+        <Menu.Menu position='right'>
+          <Menu.Item name="ForgotAccount" active={activeItem === 'ForgotAccount'} onClick={this.handleItemClick} as={Link} to="/forgotaccount">
+            <Icon name="question circle" />
+            Forgot Account
         </Menu.Item>
+
+          <Menu.Item name="Admin" active={activeItem === 'Admin'} onClick={this.handleItemClick} as={Link} to="/admin">
+            <Icon name="user" />
+            Admin
+        </Menu.Item>
+        </Menu.Menu>
+
       </Menu>
     )
   }

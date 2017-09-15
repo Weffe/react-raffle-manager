@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import { Router, Route, Switch } from 'react-router-dom'
 import Layout from './containers/Layout'
 import Home from './pages/Home'
+import ForgotAccount from './pages/ForgotAccount'
 import Admin from './pages/Admin'
 import store from './store'
 import createBrowserHistory from 'history/createBrowserHistory'
@@ -20,6 +21,7 @@ const Root = () => (
       <Layout>
         <Switch>
           <Route exact path="/" component={Home} />
+          <Route exact path="/forgotaccount" component={ForgotAccount} />
           <Route exact path="/admin" component={Admin} />
         </Switch>
       </Layout>

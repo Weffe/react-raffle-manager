@@ -13,7 +13,7 @@ class AppLogin extends Component {
 
   handleSubmit = async () => {
     const { Username, Password } = this.state
-    const { store } = this.props
+    const { store, history } = this.props
 
     const validStatus = await validateAppLogin(Username, Password)
 
@@ -24,7 +24,7 @@ class AppLogin extends Component {
         if (res) {
           toast.success('Successfully logged in!')
           store.setACtiveNavItem('Leaderboard')
-          this.props.history.push('/')
+          history.push('/')
         }
       })
     } else {

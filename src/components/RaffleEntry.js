@@ -1,13 +1,23 @@
 import React, { Component } from 'react'
-import { Button, Form } from 'semantic-ui-react'
+import { Button, Form, Divider } from 'semantic-ui-react'
 import { incrementRaffleTickets } from '../utils/api'
 import { toast } from 'react-toastify'
+import { withRouter } from 'react-router-dom'
+import { inject } from 'mobx-react'
 
-export default class RaffleEntry extends Component {
+@inject('store')
+class RaffleEntry extends Component {
   constructor(props) {
     super(props)
 
     this.state = { username: '', password: '' }
+  }
+
+  handleForgotAccountClick = () => {
+    const { store, history } = this.props
+
+    store.setACtiveNavItem('ForgotAccount')
+    history.push('/forgotaccount')
   }
 
   handleSubmit = async () => {
@@ -36,27 +46,32 @@ export default class RaffleEntry extends Component {
 
   render() {
     return (
-      <Form onSubmit={this.handleSubmit}>
-        <Form.Input
-          label="Enter Username"
-          placeholder="Username"
-          name="username"
-          type="text"
-          value={this.state.username}
-          onChange={this.handleChange}
-        />
-        <Form.Input
-          label="Enter Password"
-          placeholder="Password"
-          name="password"
-          type="password"
-          value={this.state.password}
-          onChange={this.handleChange}
-        />
-        <Button color="blue" type="submit">
-          Get Raffle Ticket
+      <div>
+        <Form onSubmit={this.handleSubmit}>
+          <Form.Input
+            label="Enter Username"
+            placeholder="Username"
+            name="username"
+            type="text"
+            value={this.state.username}
+            onChange={this.handleChange}
+          />
+          <Form.Input
+            label="Enter Password"
+            placeholder="Password"
+            name="password"
+            type="password"
+            value={this.state.password}
+            onChange={this.handleChange}
+          />
+          <Button fluid color="blue" type="submit">
+            Get Raffle Ticket
         </Button>
-      </Form>
+        </Form>
+        <Divider horizontal>Or</Divider>
+        <Button fluid secondary onClick={this.handleForgotAccountClick}>Forgot my account...</Button>
+      </div>
     )
   }
 }
+export default withRouter(RaffleEntry)

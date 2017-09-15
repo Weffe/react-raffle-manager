@@ -43,7 +43,7 @@ export default class Leaderboard extends Component {
     return (
       <div>
         <Header as="h2">Leaderboard</Header>
-        <ReactTable loading={loading} data={data} columns={columns} className="-striped -highlight" />
+        <ReactTable loading={loading} data={data} columns={columns} className="-striped -highlight" defaultPageSize={10} />
       </div>
     )
   }

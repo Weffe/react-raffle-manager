@@ -69,7 +69,7 @@ export default class ModalSignUp extends Component {
               />
               <Form.Input
                 label="Re-Enter Password"
-                placeholder="RePassword"
+                placeholder="Password"
                 name="repassword"
                 type="password"
                 onChange={this.handleChange}
