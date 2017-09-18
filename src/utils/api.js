@@ -43,7 +43,7 @@ function getUserPassword(email, username) {
             resolve(foundPassword)
           }
           else if (!foundMatch && index === usersLength) {
-            reject('No matched password found.')
+            reject('Password does not match.')
           }
         })
       })
@@ -81,14 +81,65 @@ function getUsername(email, password) {
   })
 }
 
+export function resetUsername(email, password, newUsername) {
+  return new Promise((resolve, reject) => {
+    usersList.whenReady(list => {
+      const users = list.getEntries()
+      let usersLength = users.length - 1
+      let foundMatch = false
+      users.forEach((userID, index) => {
+
+        client.record.getRecord(userID).whenReady(record => {
+          let data = record.get()
+
+          if (data.password === password && data.email === email) {
+            foundMatch = true
+            record.set('username', newUsername)
+            resolve('Reset username!')
+          }
+          else if (!foundMatch && index === usersLength) {
+            reject('Password is not valid.')
+          }
+        })
+      })
+    })
+  })
+}
+
+export function resetUserPassword(email, username, newPassword) {
+  return new Promise((resolve, reject) => {
+    usersList.whenReady(list => {
+      const users = list.getEntries()
+      let usersLength = users.length - 1
+      let foundMatch = false
+      users.forEach((userID, index) => {
+
+        client.record.getRecord(userID).whenReady(record => {
+          let data = record.get()
+
+          if (data.username === username && data.email === email) {
+            foundMatch = true
+            record.set('password', newPassword)
+            resolve('Reset password!')
+          }
+          else if (!foundMatch && index === usersLength) {
+            reject('Username is not valid.')
+          }
+        })
+      })
+    })
+  })
+}
+
 export function validateAppLogin(username, password) {
   return new Promise((resolve, reject) => {
-    let validStatus = null
     privateRecord.whenReady(record => {
       const data = record.get()
-      validStatus = d(data.username) === username && d(data.password) === password
+      if (d(data.username) === username && d(data.password) === password)
+        resolve('Valid credentials.')
+      else
+        reject('Credentials do not match.')
     })
-    resolve(validStatus)
   })
 }
 
@@ -116,35 +167,70 @@ export function registerNewUser(firstName, lastName, username, password, email) 
     const guid = client.getUid()
     const newUserId = `users/${guid}`
     const lastUpdated = moment()
-    let raffleEntries = null
-    const newData = {
+
+    const userData = {
       guid,
       firstName,
       lastName,
       username,
       password,
-      email,
+      email
+    }
+
+    const raffleEntryData = {
+      guid,
+      lastUpdated,
       tickets: 1
     }
 
     // set new record inside users record
-    client.record.getRecord(newUserId).set(newData)
+    client.record.getRecord(newUserId).set(userData)
 
     // add to usersList
     usersList.addEntry(newUserId)
 
     // add to raffle entries record
-    raffleEntries = raffleEntriesRecord.get()
-    if (isEmpty(raffleEntries) && isObject(raffleEntries)) raffleEntries = []
-    raffleEntries.push({ ...newData, lastUpdated })
-    raffleEntriesRecord.set(raffleEntries)
-    resolve(true)
+    raffleEntriesRecord.whenReady((record) => {
+      let raffleEntries = record.get()
+
+      // catching edge case error for starting with an empty object
+      if (isEmpty(raffleEntries) && isObject(raffleEntries)) raffleEntries = []
+
+      raffleEntries.push(raffleEntryData)
+      record.set(raffleEntries)
+      resolve('Registered new user.')
+    })
   })
 }
 
+// TODO: need to refactor
+// loop through users/id
+// match username and pw with guid
+// with matched guid find entry in raffleEntries
+// increment matched entry
 export function incrementRaffleTickets(username, password) {
   return new Promise((resolve, reject) => {
-    let successStatus = 'ERROR' // default error code
+    usersList.whenReady(list => {
+      const users = list.getEntries()
+      let usersLength = users.length - 1
+      let foundMatch = false
+      users.forEach((userID, index) => {
+
+        client.record.getRecord(userID).whenReady(record => {
+          let data = record.get()
+
+          if (data.username === username && data.email === email) {
+            foundMatch = true
+            record.set('password', newPassword)
+            resolve('Reset password!')
+          }
+          else if (!foundMatch && index === usersLength) {
+            reject('Username is not valid.')
+          }
+        })
+      })
+    })
+
 
     raffleEntriesRecord.whenReady(record => {
       const raffleEntries = record.get()

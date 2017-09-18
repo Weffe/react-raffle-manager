@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Form, Divider } from 'semantic-ui-react'
+import { Button, Form, Divider, Message } from 'semantic-ui-react'
 import { incrementRaffleTickets } from '../utils/api'
 import { toast } from 'react-toastify'
 import { withRouter } from 'react-router-dom'
@@ -20,26 +20,19 @@ class RaffleEntry extends Component {
     history.push('/forgotaccount')
   }
 
-  handleSubmit = async () => {
-    // clear values
-    this.setState({ username: '', password: '' })
-    const successStatus = await incrementRaffleTickets(this.state.username, this.state.password)
+  handleSubmit = () => {
+    incrementRaffleTickets(this.state.username, this.state.password)
+      .then((res) => {
+        // clear values
+        this.setState({ username: '', password: '' })
 
-    switch (successStatus) {
-      case 'SUCCESS':
-        toast.success('Successfully added a ticket!')
-        break
-      case 'ERROR':
-        toast.error('Username or Password was incorrect!')
-        break
-      case 'WARN':
-        console.log('hello?')
-        toast.warn('Already added your weekly ticket!')
-        break
-      default:
-        toast.error('There was an unexpected error!')
-    }
-
+        if (res.type === 'SUCCESS')
+          toast.success('Successfully added a ticket!')
+        else if (res.type === 'WARN')
+          toast.warn('Already added your weekly ticket!')
+      })
+      .catch((error) => this.setState({ hasError: true, errorMsg: error }))
+    // toast.error('Username or Password was incorrect!')
   }
 
   handleChange = ({ target: { name, value } }) => this.setState({ [name]: value })
@@ -47,7 +40,7 @@ class RaffleEntry extends Component {
   render() {
     return (
       <div>
-        <Form onSubmit={this.handleSubmit}>
+        <Form error={this.state.hasError} onSubmit={this.handleSubmit}>
           <Form.Input
             label="Enter Username"
             placeholder="Username"
@@ -66,7 +59,8 @@ class RaffleEntry extends Component {
           />
           <Button fluid color="blue" type="submit">
             Get Raffle Ticket
-        </Button>
+          </Button>
+          <Message error header={this.state.errorMsg} />
         </Form>
         <Divider horizontal>Or</Divider>
         <Button fluid secondary onClick={this.handleForgotAccountClick}>Forgot my account...</Button>

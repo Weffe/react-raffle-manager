@@ -5,7 +5,7 @@ import { isEmpty, forEach } from 'lodash'
 import { toast } from 'react-toastify'
 
 export default class ModalSignUp extends Component {
-  state = { pwsDontMatch: null, modalActive: false }
+  state = { pwsDontMatch: null, modalActive: false, errorMsg: '' }
 
   handleChange = ({ target: { name, value } }) => this.setState({ [name]: value.trim() })
 
@@ -17,9 +17,9 @@ export default class ModalSignUp extends Component {
     })
 
     if (someFieldIsEmpty) {
-      this.setState({ hasError: true, errorType: 'PW_EMPTY' })
+      this.setState({ hasError: true, errorMsg: 'A form field is empty.' })
     } else if (repassword !== password) {
-      this.setState({ hasError: true, errorType: 'PW_NOMATCH' })
+      this.setState({ hasError: true, errorMsg: 'Your passwords do not match.' })
     } else {
       registerNewUser(firstName, lastName, username, password, email).then(() => {
         toast.success('Successfully signed up and received 1 raffle ticket!')
@@ -75,7 +75,7 @@ export default class ModalSignUp extends Component {
                 onChange={this.handleChange}
                 required
               />
-              <Message error header={errorType === 'PW_NOMATCH' ? "Your passwords don't match!" : 'A form field is empty!'} />
+              <Message error header={this.state.errorMsg} />
             </Form>
           </Modal.Content>
           <Modal.Actions>

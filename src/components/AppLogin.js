@@ -7,29 +7,29 @@ import { toast } from 'react-toastify'
 
 @inject('store')
 class AppLogin extends Component {
-  state = { hasError: false }
+  state = { hasError: false, errorMsg: '' }
 
-  handleChange = ({ target: { placeholder, value } }) => this.setState({ [placeholder]: value })
+  handleChange = ({ target: { name, value } }) => this.setState({ [name]: value })
 
   handleSubmit = async () => {
-    const { Username, Password } = this.state
+    const { username, password } = this.state
     const { store, history } = this.props
 
-    const validStatus = await validateAppLogin(Username, Password)
+    validateAppLogin(username, password)
+      .then(() => {
+        this.setState({ hasError: false })
 
-    if (validStatus) {
-      this.setState({ hasError: false })
-
-      store.login().then(res => {
-        if (res) {
-          toast.success('Successfully logged in!')
-          store.setACtiveNavItem('Leaderboard')
-          history.push('/')
-        }
+        store.login().then(res => {
+          if (res) {
+            toast.success('Successfully logged in!')
+            store.setACtiveNavItem('Leaderboard')
+            history.push('/')
+          }
+        })
       })
-    } else {
-      this.setState({ hasError: true })
-    }
+      .catch((error) => {
+        this.setState({ hasError: true, errorMsg: error })
+      })
   }
 
   render() {
@@ -38,10 +38,10 @@ class AppLogin extends Component {
         <Grid.Row>
           <Grid.Column width={8} mobile={16}>
             <Form unstackable onSubmit={this.handleSubmit} error={this.state.hasError}>
-              <Form.Input label="Enter Username" placeholder="Username" type="password" onChange={this.handleChange} />
-              <Form.Input label="Enter Password" placeholder="Password" type="password" onChange={this.handleChange} />
+              <Form.Input label="Enter Username" placeholder="Username" name="username" type="password" onChange={this.handleChange} />
+              <Form.Input label="Enter Password" placeholder="Password" name="password" type="password" onChange={this.handleChange} />
               <Button type="submit">Submit</Button>
-              <Message error header="Incorrect input values" />
+              <Message error header={this.state.errorMsg} />
             </Form>
           </Grid.Column>
         </Grid.Row>
