@@ -57,8 +57,7 @@ export default class Home extends Component {
   }
 
   render() {
-    //const { loginStatus } = this.props.store.admin
-    const loginStatus = true
+    const { loginStatus } = this.props.store.admin
     return (
       <Grid stackable>
         {this.renderModalSignUp(loginStatus)}

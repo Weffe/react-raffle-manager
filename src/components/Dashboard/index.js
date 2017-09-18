@@ -9,7 +9,8 @@ export default class Login extends Component {
   setAdminLoginStatus = status => this.setState({ adminLoginStatus: status })
 
   render() {
-    const { adminLoginStatus } = this.state
+    // const { adminLoginStatus } = this.state
+    const adminLoginStatus = true
     return (
       <Grid>
         <Grid.Row>

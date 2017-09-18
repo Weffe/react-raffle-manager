@@ -24,15 +24,14 @@ class RaffleEntry extends Component {
     incrementRaffleTickets(this.state.username, this.state.password)
       .then((res) => {
         // clear values
-        this.setState({ username: '', password: '' })
+        this.setState({ username: '', password: '', hasError: false })
 
         if (res.type === 'SUCCESS')
-          toast.success('Successfully added a ticket!')
+          toast.success(res.payload)
         else if (res.type === 'WARN')
-          toast.warn('Already added your weekly ticket!')
+          toast.warn(res.payload)
       })
       .catch((error) => this.setState({ hasError: true, errorMsg: error }))
-    // toast.error('Username or Password was incorrect!')
   }
 
   handleChange = ({ target: { name, value } }) => this.setState({ [name]: value })

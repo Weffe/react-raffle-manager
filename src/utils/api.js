@@ -179,6 +179,8 @@ export function registerNewUser(firstName, lastName, username, password, email) 
 
     const raffleEntryData = {
       guid,
+      firstName,
+      lastName,
       lastUpdated,
       tickets: 1
     }
@@ -203,14 +205,14 @@ export function registerNewUser(firstName, lastName, username, password, email) 
   })
 }
 
-// TODO: need to refactor
-// loop through users/id
-// match username and pw with guid
-// with matched guid find entry in raffleEntries
-// increment matched entry
+/** Increments ticket count for a specified entry
+ * @param {string} username
+ * @param {string} password
+ * @return {Object} - {type: 'MSG_TYPE', payload: 'msg'}
+ */
 export function incrementRaffleTickets(username, password) {
   return new Promise((resolve, reject) => {
-    usersList.whenReady(list => {
+    usersList.whenReady((list) => {
       const users = list.getEntries()
       let usersLength = users.length - 1
       let foundMatch = false
@@ -219,52 +221,35 @@ export function incrementRaffleTickets(username, password) {
         client.record.getRecord(userID).whenReady(record => {
           let data = record.get()
 
-          if (data.username === username && data.email === email) {
+          // matched user
+          if (data.username === username && data.password === password) {
             foundMatch = true
-            record.set('password', newPassword)
-            resolve('Reset password!')
+
+            raffleEntriesRecord.whenReady((record) => {
+              const raffleEntries = record.get()
+
+              raffleEntries.forEach(entry => {
+                if (entry.guid === data.guid) {
+                  // check if the tickets has been updated in the last 6 hours
+                  const hourDifference = moment().diff(entry.lastUpdated, 'seconds') // change back to hours instead of seconds!
+                  if (hourDifference > 6) {
+                    entry.tickets += 1
+                    entry.lastUpdated = moment()
+                    record.set(raffleEntries)
+                    resolve({ type: 'SUCCESS', payload: 'Successfully added a raffle ticket!' })
+                  } else {
+                    resolve({ type: 'WARN', payload: 'Already added your weekly ticket!' })
+                  }
+                }
+              })
+            })
           }
           else if (!foundMatch && index === usersLength) {
-            reject('Username is not valid.')
+            reject('Username or Password was incorrect!')
           }
         })
       })
     })
-
-
-    raffleEntriesRecord.whenReady(record => {
-      const raffleEntries = record.get()
-      let userID = null
-
-      raffleEntries.forEach(entry => {
-        if (entry.username === username && entry.password === password) {
-          // check if the tickets has been updated in the last 6 hours
-          const hourDifference = moment().diff(entry.lastUpdated, 'hours') // change back to hours instead of seconds!
-          if (hourDifference > 6) {
-            entry.tickets += 1
-            entry.lastUpdated = moment()
-            userID = `users/${entry.guid}`
-            successStatus = 'SUCCESS'
-          } else {
-            successStatus = 'WARN'
-          }
-        }
-      })
-
-      if (successStatus === 'SUCCESS') {
-        // set raffle entries record
-        record.set(raffleEntries)
-
-        // set specific user info
-        client.record.getRecord(userID).whenReady(record => {
-          const data = record.get()
-          data.tickets += 1
-          record.set(data)
-        })
-      }
-    })
-
-    resolve(successStatus)
   })
 }
 
@@ -281,8 +266,8 @@ export function getRaffleList() {
         validateRaffleEntry(entry)
           .then(res => {
             // push the same entry N times equal to the no. of tickets
-            for (let i = 0; i < entry.tickets; i++) {
-              validEntries.push(entry)
+            for (let i = 0; i < res.tickets; i++) {
+              validEntries.push(res)
             }
           })
           .catch(err => console.error(err))
@@ -298,7 +283,6 @@ export function getRaffleList() {
  * @param {Object} winner
  */
 export function updateRaffleWinner(winner) {
-  console.log(winner)
   return new Promise((resolve, reject) => {
     raffleEntriesRecord.whenReady(record => {
       const raffleEntries = record.get()
@@ -313,14 +297,6 @@ export function updateRaffleWinner(winner) {
 
       // set raffle entries record
       record.set(raffleEntries)
-
-      // set specific user info
-      client.record.getRecord(`users/${winner.guid}`).whenReady(record => {
-        const data = record.get()
-        data.tickets = data.tickets >= 1 ? data.tickets - 1 : 0
-        data.lastWon = nowDate
-        record.set(data)
-      })
     })
 
     resolve(true)

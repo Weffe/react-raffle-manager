@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Grid } from 'semantic-ui-react'
-import Leaderboard from '../Leaderboard/'
+import UsersTable from './UsersTable/'
 import Raffle from './Raffle'
 
 export default class Dashboard extends Component {
@@ -17,7 +17,7 @@ export default class Dashboard extends Component {
           </Grid.Column>
 
           <Grid.Column>
-            <Leaderboard />
+            <UsersTable />
           </Grid.Column>
         </Grid.Row>
       </Grid>
