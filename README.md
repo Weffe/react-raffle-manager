@@ -17,3 +17,7 @@ It supports real-time updates whenever someone adds a ticket or wins a raffle vi
   3. To build a production ready bundle: `npm run build`
 
   4. To upload the build to surge.sh (defaults to raffle.swingdanceclub.surge.sh): `npm run upload`
+
+### Side Note
+
+Admin account info is not provided due to the fact that this webpage is viewable online. Pretty much for security reasons.
