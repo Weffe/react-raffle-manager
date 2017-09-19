@@ -1,5 +1,7 @@
 # Raffle Manager
 
+![Page Preview](./public/page-preview.png "Page Preview")
+
 Website: http://raffle.swingdanceclub.surge.sh/
 
 This is a web app that is used by CSUF Swing Dance Club to manage digital raffle tickets.
