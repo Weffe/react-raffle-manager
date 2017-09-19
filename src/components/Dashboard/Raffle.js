@@ -141,8 +141,6 @@ export default class Dashboard extends Component {
           let winner = shuffledEntries[randomIndex]
 
           let winnerName = computedName(winner)
-          console.log(winner)
-          console.log(winnerName)
 
           // update the winner's tickets and lastWon via api
           updateRaffleWinner(winner)

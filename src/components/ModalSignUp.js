@@ -29,7 +29,7 @@ export default class ModalSignUp extends Component {
   }
 
   render() {
-    const { modalActive, hasError, errorType } = this.state
+    const { modalActive, hasError } = this.state
     return (
       <div>
         <Button animated="fade" color="green" circular onClick={() => this.setState({ modalActive: true })}>
@@ -41,40 +41,12 @@ export default class ModalSignUp extends Component {
           <Header icon="add user" content="Create Account" />
           <Modal.Content>
             <Form error={hasError}>
-              <Form.Input
-                label="Enter First Name"
-                placeholder="First Name"
-                name="firstName"
-                type="text"
-                onChange={this.handleChange}
-                required
-              />
-              <Form.Input
-                label="Enter Last Name"
-                placeholder="Last Name"
-                name="lastName"
-                type="text"
-                onChange={this.handleChange}
-                required
-              />
+              <Form.Input label="Enter First Name" placeholder="First Name" name="firstName" type="text" onChange={this.handleChange} required />
+              <Form.Input label="Enter Last Name" placeholder="Last Name" name="lastName" type="text" onChange={this.handleChange} required />
               <Form.Input label="Enter Email" placeholder="Email" name="email" type="email" onChange={this.handleChange} required />
               <Form.Input label="Enter Username" placeholder="Username" name="username" type="text" onChange={this.handleChange} required />
-              <Form.Input
-                label="Enter Password"
-                placeholder="Password"
-                name="password"
-                type="password"
-                onChange={this.handleChange}
-                required
-              />
-              <Form.Input
-                label="Re-Enter Password"
-                placeholder="Password"
-                name="repassword"
-                type="password"
-                onChange={this.handleChange}
-                required
-              />
+              <Form.Input label="Enter Password" placeholder="Password" name="password" type="password" onChange={this.handleChange} required />
+              <Form.Input label="Re-Enter Password" placeholder="Password" name="repassword" type="password" onChange={this.handleChange} required />
               <Message error header={this.state.errorMsg} />
             </Form>
           </Modal.Content>

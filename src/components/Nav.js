@@ -6,11 +6,22 @@ import { observer, inject } from 'mobx-react'
 @inject('store')
 @observer
 export default class Nav extends Component {
-
   handleItemClick = (e, { name }) => this.props.store.setACtiveNavItem(name)
+
+  renderForgotAccountItem = (loginStatus, activeItem) => {
+    if (!loginStatus) return null
+
+    return (
+      <Menu.Item name="ForgotAccount" active={activeItem === 'ForgotAccount'} onClick={this.handleItemClick} as={Link} to="/forgotaccount">
+        <Icon name="question circle" />
+        Forgot Account
+      </Menu.Item>
+    )
+  }
 
   render() {
     const { activeItem } = this.props.store.nav
+    const { loginStatus } = this.props.store.admin
 
     return (
       <Menu stackable inverted color="blue" style={{ borderRadius: 0 }}>
@@ -23,21 +34,15 @@ export default class Nav extends Component {
           Leaderboard
         </Menu.Item>
 
-        <Menu.Menu position='right'>
-          <Menu.Item name="ForgotAccount" active={activeItem === 'ForgotAccount'} onClick={this.handleItemClick} as={Link} to="/forgotaccount">
-            <Icon name="question circle" />
-            Forgot Account
-        </Menu.Item>
+        <Menu.Menu position="right">
+          {this.renderForgotAccountItem(loginStatus, activeItem)}
 
           <Menu.Item name="Admin" active={activeItem === 'Admin'} onClick={this.handleItemClick} as={Link} to="/admin">
             <Icon name="user" />
             Admin
-        </Menu.Item>
+          </Menu.Item>
         </Menu.Menu>
-
       </Menu>
     )
   }
 }
-
-

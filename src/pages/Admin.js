@@ -8,8 +8,7 @@ import { inject, observer } from 'mobx-react'
 @observer
 export default class Admin extends Component {
   render() {
-    // const { loginStatus } = this.props.store.admin
-    const loginStatus = true
+    const { loginStatus } = this.props.store.admin
     return (
       <Grid centered>
         <Grid.Row columns={1}>

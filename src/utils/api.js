@@ -1,12 +1,12 @@
 import { client, privateRecord, usersList, raffleEntriesRecord } from './deepstream'
-import { isEmpty, isObject, random } from 'lodash'
+import { isEmpty, isObject } from 'lodash'
 import moment from 'moment'
-
 
 export function d(v) {
   return atob(v)
 }
 
+// eslint-disable-next-line
 function dump() {
   raffleEntriesRecord.whenReady(record => {
     const entries = record.get()
@@ -15,68 +15,7 @@ function dump() {
       console.log('first name:' + entry.firstName)
       console.log('last name:' + entry.lastName)
       console.log('u:' + entry.username)
-      console.log('p' + entry.password)
       console.log('----------')
-    })
-  })
-}
-
-/**
- * Gets the password of a user via specified credentials
- * @param {string} email
- * @param {string} username
- */
-function getUserPassword(email, username) {
-  return new Promise((resolve, reject) => {
-    usersList.whenReady(list => {
-      const users = list.getEntries()
-      let usersLength = users.length - 1
-      let foundPassword = null
-      let foundMatch = false
-      users.forEach((userID, index) => {
-
-        client.record.getRecord(userID).whenReady(record => {
-          let data = record.get()
-
-          if (data.username === username && data.email === email) {
-            foundPassword = data.password
-            resolve(foundPassword)
-          }
-          else if (!foundMatch && index === usersLength) {
-            reject('Password does not match.')
-          }
-        })
-      })
-    })
-  })
-}
-
-/**
- * Gets the username of a user via specified credentials
- * @param {string} email
- * @param {string} password 
- */
-function getUsername(email, password) {
-  return new Promise((resolve, reject) => {
-    usersList.whenReady(list => {
-      const users = list.getEntries()
-      let usersLength = users.length - 1
-      let foundUsername = null
-      let foundMatch = false
-      users.forEach((userID, index) => {
-
-        client.record.getRecord(userID).whenReady(record => {
-          let data = record.get()
-
-          if (data.password === password && data.email === email) {
-            foundUsername = data.username
-            resolve(foundUsername)
-          }
-          else if (!foundMatch && index === usersLength) {
-            reject('No matched password found.')
-          }
-        })
-      })
     })
   })
 }
@@ -88,7 +27,6 @@ export function resetUsername(email, password, newUsername) {
       let usersLength = users.length - 1
       let foundMatch = false
       users.forEach((userID, index) => {
-
         client.record.getRecord(userID).whenReady(record => {
           let data = record.get()
 
@@ -96,8 +34,7 @@ export function resetUsername(email, password, newUsername) {
             foundMatch = true
             record.set('username', newUsername)
             resolve('Reset username!')
-          }
-          else if (!foundMatch && index === usersLength) {
+          } else if (!foundMatch && index === usersLength) {
             reject('Password is not valid.')
           }
         })
@@ -113,7 +50,6 @@ export function resetUserPassword(email, username, newPassword) {
       let usersLength = users.length - 1
       let foundMatch = false
       users.forEach((userID, index) => {
-
         client.record.getRecord(userID).whenReady(record => {
           let data = record.get()
 
@@ -121,8 +57,7 @@ export function resetUserPassword(email, username, newPassword) {
             foundMatch = true
             record.set('password', newPassword)
             resolve('Reset password!')
-          }
-          else if (!foundMatch && index === usersLength) {
+          } else if (!foundMatch && index === usersLength) {
             reject('Username is not valid.')
           }
         })
@@ -135,10 +70,8 @@ export function validateAppLogin(username, password) {
   return new Promise((resolve, reject) => {
     privateRecord.whenReady(record => {
       const data = record.get()
-      if (d(data.username) === username && d(data.password) === password)
-        resolve('Valid credentials.')
-      else
-        reject('Credentials do not match.')
+      if (d(data.username) === username && d(data.password) === password) resolve('Valid credentials.')
+      else reject('Credentials do not match.')
     })
   })
 }
@@ -192,7 +125,7 @@ export function registerNewUser(firstName, lastName, username, password, email) 
     usersList.addEntry(newUserId)
 
     // add to raffle entries record
-    raffleEntriesRecord.whenReady((record) => {
+    raffleEntriesRecord.whenReady(record => {
       let raffleEntries = record.get()
 
       // catching edge case error for starting with an empty object
@@ -212,12 +145,11 @@ export function registerNewUser(firstName, lastName, username, password, email) 
  */
 export function incrementRaffleTickets(username, password) {
   return new Promise((resolve, reject) => {
-    usersList.whenReady((list) => {
+    usersList.whenReady(list => {
       const users = list.getEntries()
       let usersLength = users.length - 1
       let foundMatch = false
       users.forEach((userID, index) => {
-
         client.record.getRecord(userID).whenReady(record => {
           let data = record.get()
 
@@ -225,7 +157,7 @@ export function incrementRaffleTickets(username, password) {
           if (data.username === username && data.password === password) {
             foundMatch = true
 
-            raffleEntriesRecord.whenReady((record) => {
+            raffleEntriesRecord.whenReady(record => {
               const raffleEntries = record.get()
 
               raffleEntries.forEach(entry => {
@@ -243,8 +175,7 @@ export function incrementRaffleTickets(username, password) {
                 }
               })
             })
-          }
-          else if (!foundMatch && index === usersLength) {
+          } else if (!foundMatch && index === usersLength) {
             reject('Username or Password was incorrect!')
           }
         })
@@ -297,9 +228,8 @@ export function updateRaffleWinner(winner) {
 
       // set raffle entries record
       record.set(raffleEntries)
+      resolve(true)
     })
-
-    resolve(true)
   })
 }
 
