@@ -56,7 +56,7 @@ export function resetUserPassword(email, username, newPassword) {
           if (data.username === username && data.email === email) {
             foundMatch = true
             record.set('password', newPassword)
-            resolve('Reset password!')
+            resolve('Successfully Reset password!')
           } else if (!foundMatch && index === usersLength) {
             reject('Username is not valid.')
           }
@@ -163,7 +163,7 @@ export function incrementRaffleTickets(username, password) {
               raffleEntries.forEach(entry => {
                 if (entry.guid === data.guid) {
                   // check if the tickets has been updated in the last 6 hours
-                  const hourDifference = moment().diff(entry.lastUpdated, 'seconds') // change back to hours instead of seconds!
+                  const hourDifference = moment().diff(entry.lastUpdated, 'hours') // change back to hours instead of seconds!
                   if (hourDifference > 6) {
                     entry.tickets += 1
                     entry.lastUpdated = moment()
