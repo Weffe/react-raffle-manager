@@ -17,7 +17,7 @@ export default class Home extends Component {
           <Segment>
             <Header as="h1">
               Welcome!
-              <Header.Subheader>If you don't already have a free account then register for one!</Header.Subheader>
+              <Header.Subheader>If you do not already have a free account then register for one!</Header.Subheader>
             </Header>
             <ModalSignUp />
           </Segment>
