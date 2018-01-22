@@ -1,5 +1,7 @@
 # Raffle Manager
 
+**WARNING: The following project has been deprecated and is not in use due to DeepstreamHub stopping their services. Look to raffle-manager as a better alternative.**
+
 ![Page Preview](./public/page-preview.png "Page Preview")
 
 Website: http://raffle.swingdanceclub.surge.sh/
